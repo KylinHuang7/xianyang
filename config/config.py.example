@@ -1,0 +1,6 @@
+class config:
+    debug = True
+    http_port = 8888
+    
+    app_dir = 'app'
+    
