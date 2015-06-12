@@ -1,4 +1,6 @@
 class kernel:
+    __singleton_instance = {}
+    
     @staticmethod
     def boot():
         pass
@@ -8,19 +10,20 @@ class kernel:
         p = classname.index('_')
         APP_DIR = 'app'
         if p:
-            app = classname[:p]
+            appname = classname[:p]
             classmodule = classname[p+1:]
             type = classmodule[:3]
             if type == 'ctl':
                 classmodule = classmodule[4:].replace('_', '.')
-                path = APP_DIR+'.'+app+'.controller.'+classmodule
-                return __import__(path).__getattribute__(app).__getattribute__('controller').__getattribute__(classmodule).__getattribute__(classname)
+                mvc = 'controller'
             elif type == 'mdl':
                 classmodule = classmodule[4:].replace('_', '.')
-                path = APP_DIR+'.'+app+'.model.'+classmodule
-                return __import__(path).__getattribute__(app).__getattribute__('model').__getattribute__(classmodule).__getattribute__(classname)
+                mvc = 'model'
             else:
-                classmodule = classmodule[1:].replace('_', '.')
-                path = APP_DIR+'.'+app+'.lib.'+classmodule
-                return __import__(path).__getattribute__(app).__getattribute__('lib').__getattribute__(classmodule).__getattribute__(classname)
+                classmodule = classmodule.replace('_', '.')
+                mvc = 'lib'
+            path = APP_DIR+'.'+appname+'.'+mvc+'.'+classmodule
+            if classname not in kernel.__singleton_instance:
+                kernel.__singleton_instance[classname] = __import__(path).__getattribute__(appname).__getattribute__(mvc).__getattribute__(classmodule).__getattribute__(classname)
+            return kernel.__singleton_instance[classname]
         return None
